@@ -1,0 +1,27 @@
+.b-color{
+  color: #00feff;
+}
+.g-color {
+  color: #00ff00;
+}
+
+.r-color{
+  color: #ff0000;
+}
+
+.y-color{
+  color: rgb(255, 210, 0);
+}
+
+.b-bg-color{
+  background-color: rgba(0, 254, 255, .4);
+}
+
+.r-bg-bg-color{
+  background-color: rgba(255, 0,0, .4);
+}
+
+.g-bg-color{
+  background-color: rgba(0, 255, 0, .4);
+}
+
