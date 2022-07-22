@@ -1,42 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <title>蓝博同创餐饮业大数据监控平台</title> -->
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/ele.css" />
+    <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="css/base.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>蓝博同创餐饮业大数据监控平台</title>
-  <link rel="stylesheet" href="css/reset.css">
-  <link rel="stylesheet" href="css/ele.css">
-  <link rel="stylesheet" href="css/index.css">
-  <link rel="stylesheet" href="css/base.css">
-</head>
+  <body>
+    <div id="contain">
+      <div id="map" ref="map"></div>
+    </div>
+    <script src="js/vue@2.6.14.js"></script>
+    <script src="js/ele.js"></script>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/echarts-liquidfill.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/utils.js"></script>
 
-<body>
-  <div id="contain">
-    <div id="map" ref="map"></div>
-  </div>
-  <script src="js/vue@2.6.14.js"></script>
-  <script src="js/ele.js"></script>
-  <script src="js/echarts.min.js"></script>
-  <script src="js/echarts-liquidfill.js"></script>
-  <script src="js/map.js"></script>
-  <script src="js/utils.js"></script>
-
-  <script>
-    var example1 = new Vue({
-      el: '#contain',
-      data() {
-        return {
-
-        }
-      },
-      mounted() {
-        console.log(handeshenJson())
-        map(this.$refs.map)
-      }
-    })
-  </script>
-</body>
-
+    <script>
+      var example1 = new Vue({
+        el: "#contain",
+        data() {
+          return {};
+        },
+        mounted() {
+          map({
+            id: "map",
+            data: [
+              { name: "东城区", value: 1 },
+              { name: "西城区", value: 1 },
+              { name: "朝阳区", value: 1 },
+              { name: "丰台区", value: 1 },
+              { name: "石景山区", value: 10 },
+              { name: "海淀区", value: 1 },
+              { name: "门头沟区", value: 1 },
+              { name: "房山区", value: 1 },
+              { name: "通州区", value: 1 },
+              { name: "顺义区", value: 1 },
+              { name: "昌平区", value: 1 },
+              { name: "大兴区", value: 1 },
+              { name: "怀柔区", value: 1 },
+              { name: "平谷区", value: 1 },
+              { name: "密云区", value: 1 },
+              { name: "延庆区", value: 1 },
+            ],
+          });
+        },
+      });
+    </script>
+  </body>
 </html>

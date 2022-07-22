@@ -1,9 +1,47 @@
-#contain{
+#contain {
   width: 1920px;
   height: 1080px;
   background: #000;
   position: relative;
-  #map{
+
+  .map-tooltip {
+    background: rgba(0, 0, 0, .5);
+    border-radius: 4px;
+    color: #fff;
+    margin-top: -80px;
+    padding: 10px 20px !important;
+
+    p {
+      &:first-child {
+
+        position: relative;
+        margin: 10px 0 20px 0;
+
+        &::after {
+          content: '';
+          display: inline-block;
+          width: 100%;
+          height: 4px;
+          background: linear-gradient(-90deg, #52A7FF 0%, rgba(85, 209, 255, 0) 100%);
+          position: absolute;
+          bottom: -10px;
+          left: 0;
+        }
+      }
+
+      &:not(.title) {
+        padding: 6px 0;
+        &>span{
+          display: inline-block;
+          &:first-child{
+            width: 140px;
+          }
+        }
+      }
+    }
+  }
+
+  #map {
     position: absolute;
     top: 0;
     left: 0;
