@@ -5,17 +5,176 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- <title>蓝博同创餐饮业大数据监控平台</title> -->
-    <link rel="stylesheet" href="css/reset.css" />
     <link rel="stylesheet" href="css/ele.css" />
+    <link rel="stylesheet" href="css/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="css/reset.css" />
     <link rel="stylesheet" href="css/index.css" />
     <link rel="stylesheet" href="css/base.css" />
   </head>
 
   <body>
-    <div id="contain">
-      <div id="map" ref="map"></div>
+    <div id="contain" v-cloak>
+      <h1 class="title">餐饮业大数据监控平台</h1>
+      <!-- <svg width="750" height="40">
+        <polyline
+          fill="transparent"
+          stroke-width="3"
+          points="0,8 135,8 150,16 187.5,16 202.5,24 540,24 562.5,16 600,16 615,8 750,8"
+          stroke="rgb(28, 204, 255)"
+        >
+          <animate
+            attributeName="stroke-dasharray"
+            attributeType="XML"
+            from="0, 378.68995393625954, 0, 378.68995393625954"
+            to="0, 0, 757.3799078725191, 0"
+            dur="1.2s"
+            begin="0s"
+            calcMode="spline"
+            keyTimes="0;1"
+            keySplines="0.4,1,0.49,0.98"
+            repeatCount="indefinite"
+          ></animate>
+        </polyline>
+        <polyline
+          fill="transparent"
+          stroke-width="2"
+          points="225,32 525,32"
+          stroke="rgb(28, 204, 255)"
+        >
+          <animate
+            attributeName="stroke-dasharray"
+            attributeType="XML"
+            from="0, 150, 0, 150"
+            to="0, 0, 300, 0"
+            dur="1.2s"
+            begin="0s"
+            calcMode="spline"
+            keyTimes="0;1"
+            keySplines=".4,1,.49,.98"
+            repeatCount="indefinite"
+          ></animate>
+        </polyline>
+      </svg> -->
+      <div id="map" ref="map" v-if="!btn.active" key="map1"></div>
+      <div id="map2" key="map2" v-else>
+        <div id="map2Main"></div>
+      </div>
+      <div class="btn">
+        <p
+          v-for="(item, index) in btn.data"
+          :key="index"
+          :class="{active: index === btn.active}"
+          @click="changeFn(index)"
+        >
+          {{item}}
+        </p>
+      </div>
+      <section class="main left">
+        <div>
+          <h2 class="title">统计信息</h2>
+          <section class="msg">
+            <div>
+              <h3>设备在线率</h3>
+              <div>
+                <div class="chart" id="SBZXLChart"></div>
+              </div>
+            </div>
+            <div>
+              <h3>单位告警率</h3>
+              <div>
+                <div class="chart" id="DWGJLChart"></div>
+              </div>
+            </div>
+          </section>
+          <section class="list">
+            <div v-for="(item, index) in msg" :key="index">
+              <video
+                :src="`img/${index === 3?'y': 'g'}.webm`"
+                autoplay
+                loop
+                muted
+              ></video>
+              <p>
+                <span class="num">{{item.value}}</span>
+                <span class="name">{{item.name}}</span>
+              </p>
+            </div>
+          </section>
+        </div>
+        <div>
+          <h2 class="title">地域分布</h2>
+          <div class="main" id="areaChart"></div>
+        </div>
+        <div>
+          <h2 class="title">运维单位列表</h2>
+          <div class="main table">
+            <div class="header">
+              <span>单位</span>
+              <span>运维时间</span>
+            </div>
+            <div class="scroll-list">
+              <vue-seamless-scroll
+                :data="listData"
+                :class-option="classOption"
+                class="warp"
+              >
+                <ul class="item">
+                  <li v-for="(item, index) in listData" :key="index">
+                    <span class="name" v-text="item.company"></span>
+                    <span class="num" v-text="item.data2"></span>
+                  </li>
+                </ul>
+              </vue-seamless-scroll>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="main right">
+        <div>
+          <h2 class="title">区域单位设备数量图</h2>
+          <div class="main" id="SBSLChart"></div>
+        </div>
+        <div>
+          <h2 class="title">月度告警次数TOP10</h2>
+          <div class="main" id="GJChart"></div>
+        </div>
+        <div>
+          <h2 class="title">实时数据</h2>
+          <div class="main table table-4">
+            <div class="header">
+              <span>单位</span>
+              <span>油烟</span>
+              <span>颗粒物</span>
+              <span>NMHC</span>
+            </div>
+            <div class="scroll-list">
+              <vue-seamless-scroll
+                :data="ssData"
+                :class-option="classOption"
+                class="warp"
+              >
+                <ul class="item">
+                  <li v-for="(item, index) in ssData" :key="index">
+                    <span class="name">{{item.name}}</span>
+                    <span class="num">0</span>
+                    <span class="num">0</span>
+                    <span class="num">0</span>
+                  </li>
+                </ul>
+              </vue-seamless-scroll>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
     <script src="js/vue@2.6.14.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-seamless-scroll@latest/dist/vue-seamless-scroll.min.js"></script>
+    <script src="js/api.js?v=4.0&tk=adedc06e095c1e359843702e4d92c279"></script>
+    <script
+      type="text/javascript"
+      src="https://webapi.amap.com/maps?v=1.4.15&key=a7748709c251dfe29dcd4810de81c1d2"
+    ></script>
+    <script src="js/https.js"></script>
     <script src="js/ele.js"></script>
     <script src="js/echarts.min.js"></script>
     <script src="js/echarts-liquidfill.js"></script>
@@ -26,29 +185,438 @@
       var example1 = new Vue({
         el: "#contain",
         data() {
-          return {};
+          return {
+            map: null,
+            btn: {
+              active: 0,
+              data: ["点位汇总", "点位详情"],
+            },
+            msg: [
+              {
+                name: "单位数",
+                value: 214,
+              },
+              {
+                name: "测点数",
+                value: 216,
+              },
+              {
+                name: "在线数",
+                value: 13,
+              },
+              {
+                name: "告警设备数",
+                value: 7,
+              },
+            ],
+            area: [
+              { num: 206, adminstrative: "北京市" },
+              { num: 3, adminstrative: "江苏省" },
+              { adminstrative: "", num: 2 },
+              { num: 1, adminstrative: "内蒙古自治区" },
+              { num: 1, adminstrative: "山西省" },
+              { num: 1, adminstrative: "河北省" },
+            ],
+            listData: [
+              {
+                data2: "2021-08-20",
+                people: "姚志迎（在线）/刘工（运维:18210626690）",
+                company: "北京供电福斯特开关设备有限公司",
+              },
+              {
+                data2: "2021-08-20",
+                people: "姚志迎（在线）/刘工（运维:18210626690）",
+                company: "北京恒华嘉辉科技有限公司",
+              },
+              {
+                company: "北京恒华嘉辉科技有限公司",
+                telephone: "18931645866",
+                people: "王坤",
+                data2: "2021-08-20",
+              },
+              {
+                company_type: null,
+                company: "北京燕宝汽车服务有限公司",
+                data2: "2021-08-02",
+                stoves_num: null,
+                telephone: "13911353132",
+              },
+              {
+                people: "王付荣",
+                company: "北京金风科创风电设备有限公司",
+                data2: "2021-08-20",
+              },
+              {
+                data2: "2021-11-10",
+                people: "成建友",
+                telephone: "13801334684",
+                company: "北京华联印刷有限公司",
+              },
+              {
+                company: "富智康（二期B厨）",
+                people: "李会杰",
+                data2: null,
+                job: null,
+                data2: "2021-08-20",
+              },
+              {
+                people: "李会杰",
+                data2: null,
+                job: null,
+                company: "富智康（二期电子咖啡厅）",
+                data2: "2021-08-20",
+              },
+              {
+                people: "李会杰",
+                data2: null,
+                company: "富智康（三期电子咖啡厅）",
+                job: null,
+                data2: "2021-08-20",
+              },
+              {
+                company: "富智康（三期A厨）",
+                people: "李会杰",
+                data2: "2021-08-29",
+              },
+            ],
+            classOption: {
+              singleHeight: 37,
+            },
+            top10Value: [
+              {
+                num: 36691,
+                deviceMac: "043478178",
+                company: "利乐包装(北京)有限公司",
+              },
+              {
+                company: "沈阳市油烟在线监测平台--测试",
+                num: 4971,
+                deviceMac: "044508257",
+              },
+              {
+                company: "北京浩邈汇丰医药科技有限公司",
+                deviceMac: "043419347",
+                num: 3444,
+              },
+              {
+                deviceMac: "043311387",
+                company: "北京京精医疗设备有限公司",
+                num: 3106,
+              },
+              {
+                deviceMac: "047595426",
+                num: 2147,
+                company: "北京燕宝汽车服务有限公司",
+              },
+              {
+                deviceMac: "043421780",
+                num: 1056,
+                company: "北京金风科创风电设备有限公司",
+              },
+              {
+                num: 968,
+                company: "富智康（三期电子咖啡厅）",
+                deviceMac: "037388217",
+              },
+              {
+                num: 932,
+                deviceMac: "042601188",
+                company: "富智康（二期电子咖啡厅）",
+              },
+              {
+                num: 737,
+                deviceMac: "043506002",
+                company: "北京金风科创风电设备有限公司",
+              },
+              {
+                num: 355,
+                deviceMac: "044508281",
+                company: "中国金辰西维科安全印务有限公司",
+              },
+            ],
+            ssData: new Array(20).fill({
+              name: "北京泰禾餐饮有限公司",
+            }),
+            pointArr: [
+              {
+                name: "点位1",
+                x: 116.40969,
+                y: 39.89945,
+              },
+            ],
+          };
+        },
+
+        methods: {
+          sliceDataFn(n, id, name) {
+            let index = 0,
+              timer = null;
+            let value = n.map((item) => {
+              return item.num;
+            });
+            let arr = n.slice(index, index + 4);
+            this.initChart(arr, index, id, name, Math.max(...value));
+            timer && clearInterval(timer);
+            timer = setInterval(() => {
+              let arr = n.slice(index, index + 4);
+              this.initChart(arr, index, id, name, Math.max(...value));
+              index + 4 >= n.length ? (index = 0) : index++;
+            }, 1500);
+          },
+          initChart(arr, num, id, name, max) {
+            let nameArr = arr.map((n) => {
+              return name ? n[name] : n.adminstrative || "--";
+            });
+            let valueArr = arr.map((n) => {
+              return n.num;
+            });
+            initTransverseBarChart({
+              id: id,
+              xAxis: nameArr,
+              series: valueArr,
+              num: num,
+              options: {
+                max: max,
+              },
+            });
+          },
+
+          initChartMap() {
+            map({
+              id: "map",
+              data: [
+                { name: "东城区", value: 1 },
+                { name: "西城区", value: 1 },
+                { name: "朝阳区", value: 1 },
+                { name: "丰台区", value: 1 },
+                { name: "石景山区", value: 10 },
+                { name: "海淀区", value: 1 },
+                { name: "门头沟区", value: 1 },
+                { name: "房山区", value: 1 },
+                { name: "通州区", value: 1 },
+                { name: "顺义区", value: 1 },
+                { name: "昌平区", value: 1 },
+                { name: "大兴区", value: 1 },
+                { name: "怀柔区", value: 1 },
+                { name: "平谷区", value: 1 },
+                { name: "密云区", value: 1 },
+                { name: "延庆区", value: 1 },
+              ],
+            });
+          },
+          onLoadMap() {
+            // this.map = new T.Map("map2Main");
+            // this.map.centerAndZoom(new T.LngLat(116.40969, 39.89945), 14);
+            // this.map.setStyle("black");
+            this.map = new AMap.Map("map2Main", {
+              pitch: 55,
+              viewMode: "3D",
+            });
+            this.map.setMapStyle("amap://styles/darkblue");
+            this.setPoint();
+          },
+          setPoint() {
+            // let icon = new T.Icon({
+            //   iconUrl: "img/point.png",
+            //   iconSize: new T.Point(setSize(50), setSize(60)),
+            // });
+            // this.pointArr.forEach((item) => {
+            //   let marker = new T.Marker(new T.LngLat(item.x, item.y), {
+            //     icon: icon,
+            //   });
+
+            //   this.map.addOverLay(marker);
+            //   marker.addEventListener("click", this.labelClickFn);
+            // });
+            let marker = new AMap.Marker({
+              position: new AMap.LngLat(116.40969, 39.89945),
+              title: "北京",
+            });
+
+            this.map.add(marker);
+          },
+          labelClickFn(e) {
+            console.log(e);
+          },
+          changeFn(i) {
+            this.btn.active = i;
+            if (i) {
+              this.$nextTick(() => {
+                this.onLoadMap();
+              });
+            } else {
+              this.$nextTick(() => {
+                this.initChartMap();
+              });
+            }
+          },
+          loadScript(cb, obj) {
+            if (document.getElementById(obj.id)) {
+              cb();
+            } else {
+              const script = document.createElement("script");
+              script.async = true;
+              script.src = obj.url;
+              script.id = obj.id;
+              script.onload = () => {
+                cb();
+              };
+              document.body.appendChild(script);
+            }
+          },
+        },
+        created() {
+          // this.loadScript(() => {}, {
+          //   url: "https://api.tianditu.gov.cn/api?v=4.0&tk=adedc06e095c1e359843702e4d92c279",
+          //   id: "tiandituJS",
+          // });
         },
         mounted() {
-          map({
-            id: "map",
-            data: [
-              { name: "东城区", value: 1 },
-              { name: "西城区", value: 1 },
-              { name: "朝阳区", value: 1 },
-              { name: "丰台区", value: 1 },
-              { name: "石景山区", value: 10 },
-              { name: "海淀区", value: 1 },
-              { name: "门头沟区", value: 1 },
-              { name: "房山区", value: 1 },
-              { name: "通州区", value: 1 },
-              { name: "顺义区", value: 1 },
-              { name: "昌平区", value: 1 },
-              { name: "大兴区", value: 1 },
-              { name: "怀柔区", value: 1 },
-              { name: "平谷区", value: 1 },
-              { name: "密云区", value: 1 },
-              { name: "延庆区", value: 1 },
+          this.initChartMap();
+          initPieChart({
+            id: "SBZXLChart",
+            series: [
+              {
+                name: "在线率",
+                value: 6.02,
+                itemStyle: {
+                  color: "rgba(73, 223, 255, .4)",
+                },
+              },
+              {
+                name: "离线率",
+                value: 93.98,
+                itemStyle: {
+                  color: "rgba(254, 116, 74, .1)",
+                },
+              },
             ],
+            series1: [
+              {
+                name: "在线率",
+                selected: true,
+                value: 6.02,
+                itemStyle: {
+                  color: "rgba(73, 223, 255, 1)",
+                },
+              },
+              {
+                name: "离线率",
+                value: 93.98,
+                selected: true,
+                itemStyle: {
+                  color: "rgba(254, 116, 74, .6)",
+                },
+              },
+            ],
+            options: {
+              total: {
+                value: "6.02%",
+              },
+              color: ["rgba(73, 223, 255, 1)", "rgba(73, 223, 255, .3)"],
+            },
+          });
+
+          initPieChart({
+            id: "DWGJLChart",
+            series: [
+              {
+                name: "告警率",
+                value: 3.24,
+                itemStyle: {
+                  color: "rgba(251, 63, 63, .2)",
+                },
+              },
+              {
+                name: "离线率",
+                value: 100 - 3.24,
+                itemStyle: {
+                  color: "rgba(73, 223, 255, .2)",
+                },
+              },
+            ],
+            series1: [
+              {
+                name: "告警率",
+                value: 3.24,
+                selected: true,
+                itemStyle: {
+                  color: "rgba(251, 63, 63, 1)",
+                },
+              },
+              {
+                name: "离线率",
+                value: 100 - 3.24,
+                selected: true,
+                itemStyle: {
+                  color: "rgba(73, 223, 255, 1)",
+                },
+              },
+            ],
+            options: {
+              total: {
+                value: "3.24%",
+              },
+              color: ["rgba(251, 63, 63, 1)", "rgba(73, 223, 255, .3)"],
+            },
+          });
+
+          this.sliceDataFn(this.area, "areaChart");
+
+          this.sliceDataFn(this.top10Value, "GJChart", "deviceMac");
+
+          initLineChart({
+            id: "SBSLChart",
+            xAxis: [
+              "东城区",
+              "西城区",
+              "朝阳区",
+              "丰台区",
+              "石景山区",
+              "海淀区",
+            ],
+            series: [
+              {
+                name: "设备数",
+                type: "bar",
+                barWidth: 12,
+                itemStyle: {
+                  borderRadius: 12,
+                  color: setColor(
+                    "rgba(28, 204, 255, .8)",
+                    "rgba(28, 204, 255, 0)"
+                  ),
+                },
+                emphasis: {
+                  itemStyle: {
+                    borderRadius: 12,
+                    color: setColor(
+                      "rgba(28, 204, 255, 1)",
+                      "rgba(28, 204, 255, .6)"
+                    ),
+                  },
+                },
+                data: [6, 2, 3, 4, 5, 6],
+              },
+              {
+                name: "单位数",
+                type: "line",
+                yAxisIndex: 1,
+                itemStyle: {
+                  color: "rgba(251, 205, 80, 1)",
+                },
+                data: [6, 2, 3, 4, 5, 6],
+              },
+            ],
+            options: {
+              unit: "设备数量",
+              unit1: "单位数量",
+              left: "1%",
+              axisLabel: (n) => {
+                let str = n.split("").join("\n");
+                return str;
+              },
+            },
           });
         },
       });

@@ -1,7 +1,7 @@
 const setSize = (num) => {
-  var fontSize = document.documentElement.style.fontSize.split("px")[0];
+  let fontSize = document.documentElement.style.fontSize.split("px")[0];
   if (fontSize) {
-    const scale = document.documentElement.clientWidth / 1080;
+    const scale = document.documentElement.clientWidth / 1920;
     return scale * num;
   } else {
     return num;
@@ -30,9 +30,10 @@ const creatId = () => {
 const initLineChart = (data, callBack) => {
   let options = data.options || {};
   const font = {
-    color: "#8F9FB3",
-    fontSize: setSize(29),
+    color: "#fff",
+    fontSize: setSize(16),
     fontweight: 400,
+    fontFamily: "Alibaba",
   };
 
   let myChart = echarts.getInstanceByDom(document.getElementById(data.id));
@@ -51,18 +52,18 @@ const initLineChart = (data, callBack) => {
     title: options.title,
     grid: {
       left: options.left || "2%",
-      bottom: options.bottom || setSize(10),
+      bottom: options.bottom || setSize(0),
       right: options.right || "1%",
-      top: options.top || setSize(80),
+      top: options.top || setSize(50),
       containLabel: true,
     },
     legend: {
       top: 0,
       left: "center",
       icon: "rect",
-      itemGap: setSize(35),
-      itemWidth: setSize(23),
-      itemHeight: setSize(23),
+      itemGap: setSize(10),
+      itemWidth: setSize(10),
+      itemHeight: setSize(10),
       textStyle: {
         ...font,
       },
@@ -70,6 +71,8 @@ const initLineChart = (data, callBack) => {
     },
     tooltip: {
       trigger: "axis",
+      backgroundColor: "rgba(0, 0, 0, 0.7)",
+
       textStyle: {
         ...font,
       },
@@ -100,10 +103,10 @@ const initLineChart = (data, callBack) => {
       {
         type: "value",
         name: options.unit,
-        nameGap: setSize(36),
+        nameGap: setSize(16),
         nameTextStyle: {
           ...font,
-          padding: [0, setSize(70), 0, 0],
+          padding: [0, setSize(-40), 0, 0],
         },
         axisLabel: {
           ...font,
@@ -122,10 +125,10 @@ const initLineChart = (data, callBack) => {
       {
         type: "value",
         name: options.unit1,
-        nameGap: setSize(36),
+        nameGap: setSize(16),
         nameTextStyle: {
           ...font,
-          padding: [0, 0, 0, setSize(70)],
+          padding: [0, 0, 0, setSize(-40)],
         },
         axisLabel: {
           ...font,
@@ -146,6 +149,64 @@ const initLineChart = (data, callBack) => {
   };
   myChart.setOption(option, true);
 
+  let index = 0,
+    timer = null;
+
+  const autoTooltip = () => {
+    myChart.dispatchAction({
+      type: "highlight",
+      seriesIndex: 0,
+      dataIndex: index,
+    });
+    myChart.dispatchAction({
+      type: "showTip",
+      seriesIndex: 0,
+      dataIndex: index,
+    });
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      myChart.dispatchAction({
+        type: "downplay",
+        seriesIndex: 0,
+        dataIndex: index,
+      });
+      index++;
+      myChart.dispatchAction({
+        type: "highlight",
+        seriesIndex: 0,
+        dataIndex: index,
+      });
+      myChart.dispatchAction({
+        type: "showTip",
+        seriesIndex: 0,
+        dataIndex: index,
+      });
+      if (index >= data.xAxis.length) {
+        index = 0;
+      }
+      autoTooltip();
+    }, 1000);
+  };
+
+  autoTooltip();
+
+  myChart.on("mousemove", "series", (n) => {
+    myChart.dispatchAction({
+      type: "downplay",
+      seriesIndex: 0,
+      dataIndex: index,
+    });
+    clearTimeout(timer);
+  });
+  // myChart.getZr().on("mousemove", 'series', (param) => {
+  //   if (param.event) {
+
+  //   }
+  //   clearTimeout(timer)
+  // });
+  myChart.on("globalout", "series", (n) => {
+    autoTooltip();
+  });
   window.addEventListener("resize", () => {
     myChart.setOption(option, true);
     myChart.resize();
@@ -161,9 +222,10 @@ const initLineChart = (data, callBack) => {
 const initBarChart = (data) => {
   let options = data.options || {};
   const font = {
-    color: "rgba(102, 102, 102, 1)",
-    fontSize: setSize(35),
+    color: "rgba(28, 204, 255, 1)",
+    fontSize: setSize(25),
     fontweight: 400,
+    fontFamily: "LCD",
   };
   let myChart = echarts.getInstanceByDom(document.getElementById(data.id));
   if (myChart == null) {
@@ -182,8 +244,8 @@ const initBarChart = (data) => {
     grid: {
       left: options.left || "2%",
       bottom: options.bottom || setSize(10),
-      right: options.right || "1%",
-      top: options.top || setSize(80),
+      right: options.right || "4%",
+      top: options.top || setSize(10),
       containLabel: true,
     },
     legend: {
@@ -260,11 +322,316 @@ const initBarChart = (data) => {
   });
 };
 
+const initTransverseBarChart = (data, callBack) => {
+  let options = data.options || {},
+    barWidth = 20;
+  const font = {
+    color: "rgba(102, 102, 102, 1)",
+    fontSize: setSize(20),
+    fontweight: 400,
+  };
+
+  const circle = {
+    color: "#fff",
+    width: setSize(22),
+    height: setSize(22),
+    lineHeight: setSize(76),
+    fontSize: setSize(20),
+    align: "center",
+    verticalAlign: "top",
+    borderRadius: setSize(22),
+    fontFamily: "LCD",
+  };
+  let myChart = echarts.getInstanceByDom(document.getElementById(data.id));
+  if (myChart == null) {
+    myChart = echarts.init(document.getElementById(data.id));
+  }
+
+  let option = {
+    color: options.color || [
+      "#5BB1FC",
+      "#FFB461",
+      "#7B77F2",
+      "#006cff",
+      "#5b5b5b",
+      "#6ec6c9",
+    ],
+    title: options.title,
+    grid: {
+      left: options.left || "3%",
+      bottom: options.bottom || setSize(0),
+      right: options.right || "2%",
+      top: options.top || setSize(40),
+    },
+    legend: {
+      top: 0,
+      left: "center",
+      icon: "rect",
+      itemGap: setSize(35),
+      itemWidth: setSize(23),
+      itemHeight: setSize(23),
+      textStyle: {
+        ...font,
+      },
+      ...options.legend,
+    },
+    // tooltip: {},
+    xAxis: {
+      type: "value",
+      name: options.xAxisName,
+      max: options.max || null,
+      nameTextStyle: {
+        verticalAlign: "bottom",
+        padding: [0, 0, setSize(-16), 0],
+      },
+      axisLabel: {
+        ...font,
+      },
+      axisLine: {
+        show: false,
+      },
+      axisTick: {
+        show: false,
+      },
+      splitLine: {
+        show: false,
+      },
+    },
+    yAxis: [
+      {
+        type: "category",
+        inverse: true,
+        offset: setSize(-10),
+        position: "left",
+        nameTextStyle: {
+          ...font,
+          padding: [0, setSize(60), 0, 0],
+        },
+        axisTick: {
+          show: false,
+        },
+        axisLabel: {
+          align: "left",
+          formatter: (n, index) => {
+            let idx = data.num + index + 1;
+            if (idx <= 5) {
+              return `{nt${idx}|${idx}}{text|${n}}`;
+            } else {
+              return `{nt|${idx}}{text|${n}}`;
+            }
+          },
+          rich: {
+            text: {
+              fontFamily: "Alibaba",
+              color: "#fff",
+              align: "left",
+              height: setSize(20),
+              fontSize: setSize(20),
+              padding: [setSize(-55), 0, 0, setSize(5)],
+            },
+            nt1: {
+              backgroundColor: "rgba(73, 223, 255, .6)",
+              ...circle,
+            },
+            nt2: {
+              backgroundColor: "rgba(251, 205, 80, .6)",
+              ...circle,
+            },
+            nt3: {
+              backgroundColor: "rgba(71, 222, 146, .6)",
+              ...circle,
+            },
+            nt4: {
+              backgroundColor: "rgba(24, 239, 242, .6)",
+              ...circle,
+            },
+            nt5: {
+              backgroundColor: "rgba(60, 128, 242, .6)",
+              ...circle,
+            },
+            nt: {
+              backgroundColor: "rgba(28, 204, 255, .6)",
+              ...circle,
+            },
+          },
+        },
+        axisLine: {
+          show: false,
+        },
+        splitLine: {
+          show: false,
+        },
+        data: data.xAxis,
+      },
+      {
+        type: "category",
+        inverse: true,
+        offset: options.unit ? setSize(-470) : setSize(-210),
+        axisTick: {
+          show: false,
+        },
+        axisLabel: {
+          formatter: (n) => {
+            return `{num|${n}}{unit|${options.unit || ""}}`;
+          },
+          rich: {
+            num: {
+              color: "rgba(28, 204, 255, 1)",
+              align: "right",
+              width: setSize(200),
+              verticalAlign: "top",
+              fontSize: setSize(28),
+              fontFamily: "LCD",
+              padding: [24, 0, 0, 0],
+            },
+            unit: {
+              color: "rgba(143, 159, 179, 1)",
+              align: "right",
+              verticalAlign: "top",
+              lineHeight: setSize(130),
+              fontSize: setSize(10),
+              padding: [0, 0, 0, setSize(13)],
+            },
+          },
+        },
+        axisLine: {
+          show: false,
+        },
+        splitLine: {
+          show: false,
+        },
+        data: data.series,
+      },
+    ],
+    // series: [
+    //   {
+    //     type: "pictorialBar",
+    //     legendHoverLink: false,
+    //     symbol: "rect",
+    //     symbolSize: [6, barWidth],
+    //     symbolRepeat: true,
+    //     itemStyle: {
+    //       color: 'rgba(28, 204, 255, 1)',
+    //     },
+    //     z: 9,
+    //     animationEasing: "elasticOut",
+    //     animationDuration: 1,
+    //     data: data.series,
+    //   },
+    //   {
+    //     type: "pictorialBar",
+    //     animationDuration: 0,
+    //     symbolRepeat: "fixed",
+    //     symbolMargin: "20%",
+    //     symbol: "rect",
+    //     symbolSize: [6, barWidth],
+    //     itemStyle: {
+    //       color: "rgba(28, 204, 255, .2)",
+    //     },
+    //     label: {
+    //       show: false,
+    //     },
+    //     z: 0,
+    //     animationEasing: "elasticOut",
+    //     data: data.series,
+    //   },
+    // ],
+    series: [
+      {
+        type: "bar",
+        barWidth,
+        legendHoverLink: false,
+        symbolRepeat: true,
+        silent: true,
+        itemStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 1,
+            y2: 0,
+            colorStops: [
+              {
+                offset: 0,
+                color: "rgba(28, 204, 255, .5)", // 0% 处的颜色
+              },
+              {
+                offset: 1,
+                color: "rgba(28, 204, 255, 1)", // 100% 处的颜色
+              },
+            ],
+          },
+        },
+        z: 1,
+        animationEasing: "elasticOut",
+        data: data.series,
+      },
+      {
+        type: "pictorialBar",
+        animationDuration: 0,
+        symbolRepeat: "fixed",
+        symbolMargin: "20%",
+        symbol: "roundRect",
+        symbolSize: [6, barWidth],
+        itemStyle: {
+          normal: {
+            color: "rgba(28, 204, 255, .2)",
+          },
+        },
+        label: {
+          normal: {
+            show: false,
+            position: "right",
+            offset: [0, 2],
+            distance: 30,
+            textStyle: {
+              color: "#7AF8FF",
+              fontSize: 14,
+            },
+            formatter: function (a, b) {
+              return `${a.value}`;
+            },
+          },
+        },
+        z: 0,
+        animationEasing: "elasticOut",
+        data: data.series,
+      },
+      {
+        type: "pictorialBar",
+        itemStyle: {
+          color: "#000",
+        },
+        symbolRepeat: "fixed",
+        symbolMargin: 4,
+        symbol: "roundRect",
+        symbolClip: true,
+        symbolSize: [2, barWidth],
+        symbolPosition: "start",
+        symbolOffset: [8, 0,],
+        z: 2,
+        animationEasing: "elasticOut",
+        data: data.series,
+      },
+    ],
+  };
+  myChart.setOption(option, true);
+  window.addEventListener("resize", () => {
+    myChart.setOption(option, true);
+    myChart.resize();
+  });
+  if (callBack) {
+    myChart.on("click", (params) => {
+      callBack(params);
+    });
+  }
+};
+
 const initPieChart = (data, callBack) => {
   let options = data.options || {};
   const font = {
-    color: "#8F9FB3",
-    fontSize: setSize(29),
+    color: "#fff",
+    fontSize: setSize(18),
     fontweight: 400,
   };
   let myChart = echarts.getInstanceByDom(document.getElementById(data.id));
@@ -283,13 +650,14 @@ const initPieChart = (data, callBack) => {
     title: [
       {
         left: "center",
-        top: options.top || "34%",
+        top: options.top || "center",
         z: 99,
-        text: options.total.value + (options.total.unit || ""),
+        text: options.total && options.total.value + (options.total.unit || ""),
         itemGap: setSize(8),
         textStyle: {
-          color: "rgba(60, 128, 242, 1)",
-          fontSize: setSize(69),
+          color: options.color[0],
+          fontSize: setSize(26),
+          fontFamily: "LCD",
         },
         subtext: options.total.name,
         subtextStyle: {
@@ -299,18 +667,30 @@ const initPieChart = (data, callBack) => {
         },
       },
     ],
-    tooltip: {
-      trigger: "item",
-      textStyle: {
-        ...font,
-      },
-    },
+    // tooltip: {
+    //   trigger: "item",
+    //   textStyle: {
+    //     ...font,
+    //   },
+    // },
     series: [
       {
         type: "pie",
-        radius: options.radius || ["50%", "72%"],
+        radius: options.radius || ["55%", "65%"],
         center: ["50%", "50%"],
         data: data.series,
+        showEmptyCircle: true,
+        label: {
+          show: options.label,
+        },
+      },
+      {
+        type: "pie",
+        radius: options.radius || ["65%", "80%"],
+        center: ["50%", "48%"],
+        selectedOffset: 3,
+        selectedMode: true,
+        data: data.series1,
         showEmptyCircle: true,
         label: {
           show: options.label,
@@ -319,7 +699,6 @@ const initPieChart = (data, callBack) => {
     ],
   };
   myChart.setOption(option, true);
-  callBack(myChart);
   window.addEventListener("resize", () => {
     myChart.setOption(option, true);
     myChart.resize();
@@ -574,13 +953,12 @@ const initLiquidfillChart = (data) => {
 };
 
 const map = (data) => {
-  console.log(data);
   let options = data.options || {};
   let myChart = echarts.getInstanceByDom(document.getElementById(data.id));
   if (myChart == null) {
     myChart = echarts.init(document.getElementById(data.id));
   }
-  var domImgHover = document.createElement("img");
+  let domImgHover = document.createElement("img");
   domImgHover.style.height =
     domImgHover.height =
     domImgHover.width =
@@ -590,63 +968,73 @@ const map = (data) => {
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAIAAAAmKNuZAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTQ4IDc5LjE2NDAzNiwgMjAxOS8wOC8xMy0wMTowNjo1NyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDIxLjAgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkFDQ0Q2RjYyQTdDRDExRUI4ODUxRDIxRjkzMEExNzg2IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkFDQ0Q2RjYzQTdDRDExRUI4ODUxRDIxRjkzMEExNzg2Ij4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6QUNDRDZGNjBBN0NEMTFFQjg4NTFEMjFGOTMwQTE3ODYiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6QUNDRDZGNjFBN0NEMTFFQjg4NTFEMjFGOTMwQTE3ODYiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6FboimAAAASklEQVR42mIUnL9XtHsDAzXA69IARjWtXJYX7+FCfyQEKeEyMVAVDG7jWCB+RhaihAsybjQqRqNiNCpGo2I0KoZZVDBSt9oGCDAAhYNrvRu3DWEAAAAASUVORK5CYII=";
 
   let geoCoordMapJSON = handeshenJson();
-  let geoCoordMap = {
-    东城区: [116.418757, 39.917544],
-    西城区: [116.366794, 39.915309],
-    朝阳区: [116.486409, 39.921489],
-    丰台区: [116.286968, 39.863642],
-    石景山区: [116.195445, 39.914601],
-    海淀区: [116.310316, 39.956074],
-    门头沟区: [116.105381, 39.937183],
-    房山区: [116.139157, 39.735535],
-    通州区: [116.658603, 39.902486],
-    顺义区: [116.653525, 40.128936],
-    昌平区: [116.235906, 40.218085],
-    大兴区: [116.338033, 39.728908],
-    怀柔区: [116.637122, 40.324272],
-    平谷区: [117.112335, 40.144783],
-    密云区: [116.843352, 40.377362],
-    延庆区: [115.985006, 40.465325],
-  };
   echarts.registerMap("beijing", geoCoordMapJSON);
-  var convertData = function (data) {
-    var res = [];
-    for (var i = 0; i < data.length; i++) {
-      var geoCoord = geoCoordMap[data[i].name];
-      if (geoCoord) {
-        res.push({
-          name: data[i].name,
-          value: geoCoord.concat(data[i].value),
-        });
-      }
-    }
+  let convertData = function (data) {
+    let res = data.map((n) => {
+      let geoCoord = geoCoordMapJSON.features.find((item) => {
+        return item.properties.name === n.name;
+      });
+      return (
+        (geoCoord && {
+          name: n.name,
+          value: geoCoord && [...geoCoord.properties.center, n.value],
+        }) ||
+        {}
+      );
+    });
     return res;
   };
 
-  console.log(convertData(data.data));
   let option = {
     grid: {},
     tooltip: {
-      backgroundColor: "rgba(2, 19, 24, 1)",
-      className: "map-tooltip",
+      className: "tooltip",
+      position: function (point, params, dom, rect, size) {
+        let x = 0;
+        let y = 0;
+
+        let pointX = point[0];
+        let pointY = point[1];
+
+        let boxWidth = size.contentSize[0];
+        let boxHeight = size.contentSize[1];
+
+        if (boxWidth > pointX) {
+          x = pointX + 10;
+        } else {
+          x = pointX - boxWidth + boxWidth / 2;
+        }
+
+        if (boxHeight > pointY) {
+          y = 5;
+        } else {
+          y = pointY - boxHeight;
+        }
+
+        return [x, y];
+      },
+      backgroundColor: "rgba(0, 0, 0, 0)",
       textStyle: {
         fontSize: 30,
         color: "#fff",
       },
-      formatter: (n) => {
-        console.log(n);
-        return `<div><p class="title">${
+      formatter: (param) => {
+        let n = data.data.find((nn) => {
+          return nn.name === param.name;
+        });
+        if (!n) return;
+        return `<div class="map-tooltip"><p class="title">${
           n.name
-        }</p><p><span>总设备: </span><span>0</span></p><p><span>在线: </span><span>${
+        }</p><p><span>总设备: </span><span class="num">2</span></p><p><span>在线: </span><span class="num">${
           n.value || 0
-        }</span></p><p><span>离线: </span><span>0</span></p></div>`;
+        }</span></p><p><span>离线: </span><span class="num">1</span></p></div>`;
       },
     },
     geo: {
       map: "beijing",
       aspectScale: 1,
       layoutCenter: ["50%", "50%"],
-      layoutSize: "105%",
+      layoutSize: "115%",
       itemStyle: {
         normal: {
           areaColor: {
@@ -669,14 +1057,13 @@ const map = (data) => {
           },
           shadowColor: "#0f5d9d",
           shadowOffsetX: 0,
-          shadowOffsetY: 15,
-          opacity: 0.5,
+          shadowOffsetY: 20,
+          opacity: 0.4,
         },
         emphasis: {
           areaColor: "#0f5d9d",
         },
       },
-
       regions: [
         {
           name: "南海诸岛",
@@ -706,18 +1093,15 @@ const map = (data) => {
         mapType: "beijing",
         aspectScale: 1,
         layoutCenter: ["50%", "50%"],
-        zoom: 1,
-        scaleLimit: {
-          min: 1,
-          max: 2,
-        },
+        layoutSize: "115%",
         emphasis: {
           itemStyle: {
             areaColor: {
               image: domImgHover,
-              repeat: 'repeat',
-          },
-            borderColor: "#2ab8ff",
+              repeat: "repeat",
+            },
+            // areaColor: 'rgba(251, 205, 80, .3)',
+
             borderWidth: 1,
             shadowColor: "rgba(0, 255, 255, 0.7)",
             shadowBlur: 10,
@@ -733,11 +1117,15 @@ const map = (data) => {
         },
         label: {
           show: true,
-          color: "#FFFFFF",
-          fontSize: 28,
+          textStyle: {
+            fontFamily: "Alibaba",
+            color: "#fff",
+            fontSize: 20,
+            padding: [0, -40, 0, 0],
+          },
         },
         itemStyle: {
-          areaColor: "#0c3653",
+          areaColor: "rgba(28, 204, 255,.2)",
           borderColor: "#1cccff",
           borderWidth: 1.8,
         },
@@ -748,6 +1136,7 @@ const map = (data) => {
         name: "散点",
         type: "effectScatter",
         coordinateSystem: "geo",
+        silent: true,
         rippleEffect: {
           brushType: "fill",
         },
@@ -758,28 +1147,61 @@ const map = (data) => {
             shadowColor: "#333",
           },
         },
-        data: convertData(data.data),
-
+        // symbol: "pin",
+        // symbolSize: [40, 60],
+        // label: {
+        //   show: true,
+        //   textStyle: {
+        //     color: "#fff",
+        //     fontSize: 22,
+        //   },
+        //   formatter(value) {
+        //     return value.data.value[2];
+        //   },
+        // },
         symbolSize: function (val) {
-          return 2 * val[2];
+          return val && 2 * val[2];
         },
         showEffectOn: "render",
+        data: convertData(data.data),
       },
     ],
   };
 
   myChart.setOption(option, true, 0);
 
-  let index = 0;
+  let index = 0,
+    timer = null;
+
   const autoTooltip = () => {
-    console.log(data.data.length);
-    setTimeout(function () {
+    myChart.dispatchAction({
+      type: "highlight",
+      seriesIndex: 0,
+      dataIndex: index,
+    });
+    myChart.dispatchAction({
+      type: "showTip",
+      seriesIndex: 0,
+      dataIndex: index,
+    });
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      myChart.dispatchAction({
+        type: "downplay",
+        seriesIndex: 0,
+        dataIndex: index,
+      });
+      index++;
+      myChart.dispatchAction({
+        type: "highlight",
+        seriesIndex: 0,
+        dataIndex: index,
+      });
       myChart.dispatchAction({
         type: "showTip",
         seriesIndex: 0,
         dataIndex: index,
       });
-      index++;
       if (index >= data.data.length) {
         index = 0;
       }
@@ -788,6 +1210,24 @@ const map = (data) => {
   };
 
   autoTooltip();
+
+  myChart.on("mousemove", "series", (n) => {
+    myChart.dispatchAction({
+      type: "downplay",
+      seriesIndex: 0,
+      dataIndex: index,
+    });
+    clearTimeout(timer);
+  });
+  // myChart.getZr().on("mousemove", 'series', (param) => {
+  //   if (param.event) {
+
+  //   }
+  //   clearTimeout(timer)
+  // });
+  myChart.on("globalout", "series", (n) => {
+    autoTooltip();
+  });
 
   window.addEventListener("resize", () => {
     myChart.setOption(option, true);
